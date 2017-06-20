@@ -1,5 +1,5 @@
-#William Hampton  
-##What I do  
+# William Hampton  
+## What I do  
 - Robotics  
 	- MagicBot  
 	- MagicArm  
