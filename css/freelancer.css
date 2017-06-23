@@ -495,7 +495,7 @@ fieldset[disabled] .btn-success.active {
   position: absolute;
   top: -40px;
   left: 0px;
-  color: white;
+  color: black;
   border-right: 1px solid white;
   border-bottom: 1px solid white;
   border-bottom-right-radius: 8px;
@@ -513,4 +513,5 @@ fieldset[disabled] .btn-success.active {
 }
 div#maincontent {
   outline: none;
+  color: #000000;
 }
