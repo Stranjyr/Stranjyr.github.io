@@ -79,11 +79,7 @@ header .intro-text .skills {
 	font-size: 1.25em;
 	font-weight: 300
 }
-li {
-	font-size: 1.00em;
-	font-weight: 150;
-	color: #000;
-}
+
 @media (min-width:768px) {
 	header .container {
 		padding-top: 200px;
@@ -96,10 +92,11 @@ li {
 		font-size: 1.75em
 	}
 }
-ul.list-group li.list-group-item {
-	font-size: 1em;
-	font-weight: 150
-	color:#505050;
+li {
+	font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 1.0em;
+	font-weight: 150;
+	color: #000;
 }
 .navbar-custom {
 	background: #2C3E50;
