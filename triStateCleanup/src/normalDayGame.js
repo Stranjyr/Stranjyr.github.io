@@ -29,6 +29,11 @@ var wall_group;
 var red_button;
 var launch_spot;
 
+var totalShots = 0;
+var totalButtons = 0;
+
+var scoreboard;
+
 var state = "wind-up";
 
 var ball_settings = {mass: 1};
@@ -61,6 +66,15 @@ function create()
     line = null;
     red_button = null;
     this.add.image(0, 0, 'background').setOrigin(0, 0);
+    scoreboard = this.add.text(25, 25, '', { font: '16px Courier', fill: '#00ff00' });
+    scoreboard.setDataEnabled();
+    scoreboard.data.set('balls', totalShots);
+    scoreboard.data.set('buttons', totalButtons);
+
+    scoreboard.setText(['Total Balls Thrown: ' + scoreboard.data.get('balls'), 'Total Inators Destroyed: '+ scoreboard.data.get('buttons')]);
+    scoreboard.on('changedata-balls', function(){
+        scoreboard.setText(['Total Balls Thrown: ' + scoreboard.data.get('balls'), 'Total Inators Destroyed: '+ scoreboard.data.get('buttons')]);
+    })
     load_room(this);
     
     // create_new_ball(this);
@@ -80,6 +94,8 @@ function create_new_ball(scene)
     ball.setBounce(0.9, 0.7);
     ball.setCollideWorldBounds(true);
     ball.fired = false;
+    totalShots += 1;
+    scoreboard.data.values.balls = totalShots;
     balls.unshift(ball);
     
 }
@@ -176,7 +192,8 @@ function explode_and_reset(scene)
         repeat: 0
     });
     pop.play('bomb');
-    pop.on("animationcomplete", () => { scene.registry.destroy(); 
+    pop.on("animationcomplete", () => { totalButtons+=1;
+                                        scene.registry.destroy(); 
                                         scene.events.off();
                                         scene.scene.restart();})
 }
