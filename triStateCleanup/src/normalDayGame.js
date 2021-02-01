@@ -75,6 +75,11 @@ function create()
     scoreboard.on('changedata-balls', function(){
         scoreboard.setText(['Total Balls Thrown: ' + scoreboard.data.get('balls'), 'Total Inators Destroyed: '+ scoreboard.data.get('buttons')]);
     })
+    this.input.keyboard.on('keydown-R', function (event) {
+        this.registry.destroy(); 
+        this.events.off();
+        this.scene.restart();
+    });
     load_room(this);
     
     // create_new_ball(this);
