@@ -1,10 +1,10 @@
-let scene, camera, renderer, startingNodes, leafNodes, totalNodes, maxNodes, bumbBumb, active, heartSound;
+let scene, camera, renderer, startingNodes, leafNodes, totalNodes, maxNodes, bumbBumb, ready, active, heartSound;
 
 //Line Constants
 let fixedY, startingLength, lineMaterial;
 
 class ArteryNode{
-    constructor(position, parent, depth, maxChildLen, maxAngle, minAngle, color){
+    constructor(position, parent, depth, maxChildLen, maxAngle, minAngle, color, lineWidth){
         this.position = position;
         this.parent = parent;
         this.children = [];
@@ -13,26 +13,34 @@ class ArteryNode{
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
         this.color = color;
+        this.lineWidth = lineWidth;
     }
 
     update(){
         if(Math.random() <= 1/((0.75*this.depth)+(0.1*this.children.length))){
             const angleRange = this.maxAngle - this.minAngle;
             const randAngle = Math.random() * angleRange + this.minAngle;
-            const randLength = Math.random() * this.maxChildLen;
+            const randLength = Math.max(Math.min(Math.random() * this.maxChildLen, this.maxChildLen/2), 5);
             const childPos = {x: this.position.x + Math.cos(randAngle)*randLength, 
                               y: this.position.y + Math.sin(randAngle)*randLength
                             };
             
-            const redShift = Math.floor(Math.random() * -100);
-            const greenShift = Math.floor(Math.random() * 20 - 10);
-            const blueShift = Math.floor(Math.random() * -100);
+            const redShift = Math.floor(Math.random() * -75);
+            const greenShift = Math.floor(Math.random() * 10 - 5);
+            const blueShift = Math.floor(Math.random() * -75);
             
             const red = Math.max(Math.min(((this.color & 0xff0000) >> 16) + redShift, 0xff), 0);
             const green = Math.max(Math.min(((this.color & 0x00ff00) >> 8) + greenShift, 0xff), 0);
             const blue = Math.max(Math.min((this.color & 0x0000ff) + blueShift, 0xff), 0);
             const newColor = red << 16 | green << 8 | blue;
-            const child = new ArteryNode(childPos, this, this.depth+1, randLength*0.75, randAngle + (angleRange/4), randAngle - (angleRange/4), newColor);
+            const child = new ArteryNode(childPos, 
+                                            this, 
+                                            this.depth+1, 
+                                            randLength*0.75, 
+                                            randAngle + (angleRange/3) + 0.01, 
+                                            randAngle - (angleRange/3) - 0.01, 
+                                            newColor,
+                                            Math.max(this.lineWidth * 0.75, 1));
             
             this.children.push(child);
             return child;
@@ -46,9 +54,10 @@ class ArteryNode{
 function init(){
 
     totalNodes = 0;
-    maxNodes = 10000;
+    maxNodes = 20000;
     bumbBumb = false;
-    active = true;
+    active = false;
+    ready = true;
     scene = new THREE.Scene();
 
     heartSound = document.getElementById("sound");
@@ -76,7 +85,7 @@ function init(){
 
     
     fixedY = 0;
-    startingLength = 100;
+    startingLength = 200;
     
     startingNodes = [];
     // startingNodes.push(new ArteryNode({x:0, y:0}, null, 1, startingLength, Math.PI*2, 0, 0xff00ff));
@@ -85,46 +94,60 @@ function init(){
 
 
     document.addEventListener('click', event => {
-        var x = (event.clientX - (window.innerWidth/2));
-        var y = (-event.clientY + (window.innerHeight/2));
-        console.log(x, y);
-        leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e))
+        if(ready){
+            var x = (event.clientX - (window.innerWidth/2));
+            var y = (-event.clientY + (window.innerHeight/2));
+            console.log(x, y);
+            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 100))
+            active = true;
+        }
     });
     document.addEventListener('touchstart', event => {
-        var x = (event.clientX - (window.innerWidth/2));
-        var y = (-event.clientY + (window.innerHeight/2));
-        console.log(x, y);
-        leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xff00ff))
+        if(ready){
+            var x = (event.clientX - (window.innerWidth/2));
+            var y = (-event.clientY + (window.innerHeight/2));
+            console.log(x, y);
+            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 100))
+            active = true;
+        }
     });
- 
-    setInterval(heartGrow, 100);
+
     heartZoom();
+    setInterval(heartGrow, 100);
+    
 }
 
 function heartGrow(){
-    if((totalNodes > maxNodes)){
-        setTimeout(reset, 5000);
-        active = false;
-    }
-    else if(active && leafNodes.length > 0){
-        leafNodes = generateNewNodes(leafNodes);   
+    if(active){
+        if((totalNodes > maxNodes)){
+            setTimeout(reset, 5000);
+            ready = false;
+        }
+        else if(active && leafNodes.length > 0){
+            leafNodes = generateNewNodes(leafNodes);   
+        }
     }
     
 }
 
 function heartZoom()
 {
-    bumbBumb = !bumbBumb;
-    heartSound.play();
-    if(bumbBumb)
+    if(active)
     {
-        camera.zoom = 1.01;
+        bumbBumb = !bumbBumb;
+        heartSound.play();
+        if(bumbBumb)
+        {
+            camera.zoom = 1.01;
+        }
+        else{
+            camera.zoom = 1;
+        }
+        camera.updateProjectionMatrix();
+        
     }
-    else{
-        camera.zoom = 1;
-    }
-    camera.updateProjectionMatrix();
     setTimeout(heartZoom, (+bumbBumb)*200 + 1000);
+    
 }
 
 
@@ -135,7 +158,8 @@ function reset(){
     }
     totalNodes = 0;
     startingNodes = [];
-    active = true;
+    ready = true;
+    active = false;
     // startingNodes.push(new ArteryNode({x:0, y:0}, null, 1, startingLength, Math.PI*2, 0, 0xff00ff));
 
     leafNodes = []; //generateNewNodes(startingNodes);
@@ -145,21 +169,28 @@ function reset(){
 function generateNewNodes(nodeList){
     newLeaves = [];
     nodeList.forEach(node => {
-        const child = node.update()
-        if(child !== null){
-            newLeaves.push(node);
-            newLeaves.push(child);
-
-
-            const points = [];
-            points.push( new THREE.Vector3( node.position.x, node.position.y, fixedY ) );
-            points.push( new THREE.Vector3(child.position.x, child.position.y, fixedY ) );
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            const lineMaterial = new THREE.LineBasicMaterial({color: child.color, linewidth: 2});
-            const line = new THREE.Line(geometry, lineMaterial);
-            scene.add(line);
-            totalNodes += 1;
+        while(true)
+        {
+            const child = node.update()
+            if(child !== null){
+                //newLeaves.push(node);
+                newLeaves.push(child);
+    
+    
+                const points = [];
+                points.push( new THREE.Vector3( node.position.x, node.position.y, fixedY ) );
+                points.push( new THREE.Vector3(child.position.x, child.position.y, fixedY ) );
+                const geometry = new THREE.BufferGeometry().setFromPoints( points );
+                const lineMaterial = new THREE.LineBasicMaterial({color: child.color, linewidth: 20});
+                const line = new THREE.Line(geometry, lineMaterial);
+                scene.add(line);
+                totalNodes += 1;
+            }
+            else{
+                break;
+            }
         }
+        
     });
     return newLeaves;
 }
