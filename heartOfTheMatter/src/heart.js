@@ -113,7 +113,7 @@ function init(){
     });
 
     heartZoom();
-    setInterval(heartGrow, 100);
+    setInterval(heartGrow, 300);
     
 }
 
