@@ -13,14 +13,14 @@ class ArteryNode{
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
         this.color = color;
-        this.lineWidth = lineWidth;
+        this.lineWidth = 1;
     }
 
     update(){
         if(Math.random() <= 1/((0.75*this.depth)+(0.1*this.children.length))){
             const angleRange = this.maxAngle - this.minAngle;
             const randAngle = Math.random() * angleRange + this.minAngle;
-            const randLength = Math.max(Math.min(Math.random() * this.maxChildLen, this.maxChildLen/2), 5);
+            const randLength = (1+Math.random()) * this.maxChildLen * 0.25;
             const childPos = {x: this.position.x + Math.cos(randAngle)*randLength, 
                               y: this.position.y + Math.sin(randAngle)*randLength
                             };
@@ -113,7 +113,7 @@ function init(){
     });
 
     heartZoom();
-    setInterval(heartGrow, 300);
+    setInterval(heartGrow, 100);
     
 }
 
@@ -146,7 +146,7 @@ function heartZoom()
         camera.updateProjectionMatrix();
         
     }
-    setTimeout(heartZoom, (+bumbBumb)*200 + 1000);
+    setTimeout(heartZoom, (+bumbBumb)*1000 + 600);
     
 }
 
@@ -169,11 +169,11 @@ function reset(){
 function generateNewNodes(nodeList){
     newLeaves = [];
     nodeList.forEach(node => {
-        while(true)
-        {
+        // while(true)
+        // {
             const child = node.update()
             if(child !== null){
-                //newLeaves.push(node);
+                newLeaves.push(node);
                 newLeaves.push(child);
     
     
@@ -186,10 +186,10 @@ function generateNewNodes(nodeList){
                 scene.add(line);
                 totalNodes += 1;
             }
-            else{
-                break;
-            }
-        }
+        //     else{
+        //         break;
+        //     }
+        // }
         
     });
     return newLeaves;
