@@ -98,7 +98,7 @@ function init(){
             var x = (event.clientX - (window.innerWidth/2));
             var y = (-event.clientY + (window.innerHeight/2));
             console.log(x, y);
-            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 100))
+            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 1))
             active = true;
         }
     });
@@ -107,7 +107,7 @@ function init(){
             var x = (event.clientX - (window.innerWidth/2));
             var y = (-event.clientY + (window.innerHeight/2));
             console.log(x, y);
-            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 100))
+            leafNodes.push(new ArteryNode({x: x , y: y}, null, 0, startingLength * (Math.random()+.5), Math.PI*2, 0, 0xbb0a1e, 1))
             active = true;
         }
     });
@@ -181,7 +181,7 @@ function generateNewNodes(nodeList){
                 points.push( new THREE.Vector3( node.position.x, node.position.y, fixedY ) );
                 points.push( new THREE.Vector3(child.position.x, child.position.y, fixedY ) );
                 const geometry = new THREE.BufferGeometry().setFromPoints( points );
-                const lineMaterial = new THREE.LineBasicMaterial({color: child.color, linewidth: 20});
+                const lineMaterial = new THREE.LineBasicMaterial({color: child.color, linewidth: 1});
                 const line = new THREE.Line(geometry, lineMaterial);
                 scene.add(line);
                 totalNodes += 1;
